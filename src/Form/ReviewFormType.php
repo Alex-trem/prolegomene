@@ -14,15 +14,15 @@ class ReviewFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $user = $options['user'];
-
+        $bookings = $options['bookings'];
+        
         $builder
             ->add('rating')
             ->add('booking', EntityType::class, [
                 'class' => Booking::class,
-                'choices' => $user->getBookings(),
+                'choices' => $bookings,
                 'multiple' => false,
-                'expanded' => true,
+                'expanded' => false,
             ])
             ->add('comment')
             ->add('Send', SubmitType::class)
@@ -32,7 +32,7 @@ class ReviewFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'user' => array(),
+            'bookings' => array(),
         ]);
     }
 }

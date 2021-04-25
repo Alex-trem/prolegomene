@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Calendar\Month;
+use App\Calendar\Month;
 use App\Entity\Hotel;
 use Twig\Environment;
 use App\Entity\Review;
@@ -15,6 +15,7 @@ use App\Repository\HotelRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\BedroomRepository;
 use App\Repository\BookingRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,8 +45,18 @@ class HotelsController extends AbstractController
     }
 
     #[Route('/booking/{slug}/{month}/{year}', name:'booking')]
-    public function booking(Request $request, EntityManagerInterface $entityManager, Hotel $hotel, BookingRepository $bookingRepo, BedroomRepository $bedroomRepo, ReviewRepository $reviewRepo): Response
+    public function booking(
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        Hotel $hotel, 
+        BookingRepository $bookingRepo, 
+        BedroomRepository $bedroomRepo, 
+        ReviewRepository $reviewRepo,
+        UserRepository $userRepository
+    ): Response
     {
+        $user = $this->getUser();
+
         //-- CALENDRIER --//
 
         $curentMonth = (int) $request->attributes->get('month');
@@ -81,7 +92,7 @@ class HotelsController extends AbstractController
         $bookingForm->handleRequest($request);
         if ($bookingForm->isSubmitted() && $bookingForm->isValid()) {
             $booking->setHotelId($hotel->id);
-            $booking->setUser($this->getUser());
+            $booking->setUserId($user->id);
 
             $entityManager->persist($booking);
             $entityManager->flush();
@@ -91,21 +102,23 @@ class HotelsController extends AbstractController
 
         //-- FORMULAIRE REVIEWS --//
 
+        $bookings = $bookingRepo->findByHotelAndUser($hotel->id, $user->id);
         $reviewForm = $this->createForm(NullFormType::class);
 
-        if (!is_null($this->getUser())) {
+        if (!is_null($user)) {
             $review = new Review();
             $reviewForm = $this->createForm(ReviewFormType::class, $review, [
-                'data_class' => Review::class,
-                'user' => $this->getUser()
+                'bookings' => $bookings
             ]);
             $reviewForm->handleRequest($request);
             if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
                 $review->setHotel($hotel);
-                $review->setUser($this->getUser());
+                $review->setUser($user);
 
                 $entityManager->persist($review);
                 $entityManager->flush();
+
+                $this->addFlash('success', 'Your comment has been published');
 
                 return $this->redirectToRoute('booking', ['slug' => $hotel, 'month' => $currentMonth, 'year' => $currentYear]);
             }

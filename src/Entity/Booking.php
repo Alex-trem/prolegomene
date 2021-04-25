@@ -43,10 +43,9 @@ class Booking
     public $bedroomType;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="bookings")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="integer")
      */
-    private $user;
+    private $userId;
 
     public function __construct()
     {
@@ -124,14 +123,14 @@ class Booking
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUserId(): ?int
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(?User $user): self
+    public function setUserId(?int $userId): self
     {
-        $this->user = $user;
+        $this->userId = $userId;
 
         return $this;
     }

@@ -20,7 +20,7 @@ class User implements UserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    public $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
@@ -183,7 +183,7 @@ class User implements UserInterface
     {
         if (!$this->bookings->contains($booking)) {
             $this->bookings[] = $booking;
-            $booking->setUser($this);
+            $booking->setUserId($this->id);
         }
 
         return $this;
@@ -193,8 +193,8 @@ class User implements UserInterface
     {
         if ($this->bookings->removeElement($booking)) {
             // set the owning side to null (unless already changed)
-            if ($booking->getUser() === $this) {
-                $booking->setUser(null);
+            if ($booking->getUserId() === $this->id) {
+                $booking->setUserId(null);
             }
         }
 

@@ -34,7 +34,7 @@
                 {% endif %}
                 <div class="d-flex justify-content-end align-items-center">
                     <div class="dropdown">
-                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Destinations
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -52,8 +52,20 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                {% if app.user %}
+                    <a class="badge badge-light" href="{{ path('user') }}">Account</a>
+                {% else %}
+                    <a class="badge badge-light" href="{{ path('app_login') }}">Log in</a>
+                {% endif %}
+                </div>
             </div>
         </header>
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert-{{type}}">{{ message }}</div>
+            {% endfor %}
+        {% endfor %}
         {% block body %}{% endblock %}
     </div>
     {% block outofContaier %}{% endblock %}

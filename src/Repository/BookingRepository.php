@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Booking;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Booking|null find($id, $lockMode = null, $lockVersion = null)
@@ -33,7 +34,8 @@ class BookingRepository extends ServiceEntityRepository
             ->andWhere("b.hotelId = :hotelId")
             ->setParameter("hotelId", $hotelId)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+            ;
     }
 
     /**
@@ -59,6 +61,18 @@ class BookingRepository extends ServiceEntityRepository
             }
         }
         return $days;
+    }
+
+    public function findByHotelAndUser(int $hotelId, int $userId)
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.hotelId = :hotelId')
+            ->andWhere('b.userId = :userId')
+            ->setParameter('hotelId', $hotelId)
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getResult()
+            ;
     }
 
     // /**
