@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+        <script defer src="{{asset('style/js.js')}}"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+            {# {{ encore_entry_script_tags('app') }} #}
+        {% endblock %}
+    </head>
+    <body>
+    <div class="container">
+        <header class="blog-header py-3">
+            <div class="row flex-nowrap justify-content-between align-items-center">
+                <div class="pt-1">
+                    <a class="text-muted" href="/"><h2>Home</h2></a>
+                </div>
+                {% if app.user %}
+                <div>
+                    <small>
+                        Logged in as : {{app.user.email}}
+                    </small>
+                </div>
+                {% endif %}
+                <div class="d-flex justify-content-end align-items-center">
+                    <div class="dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Destinations
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <ul>
+                                {# <li><a href="{{path('country', {country: 'USA'}) }}">USA</a></li>
+                                <li><a href="{{path('country', {country: 'Japan'}) }}">Japan</a></li>
+                                <li><a href="{{path('country', {country: 'Mexico'}) }}">Mexico</a></li>
+                                <li><a href="{{path('country', {country: 'Korea'}) }}">Korea</a></li>
+                                <li><a href="{{path('country', {country: 'Indonesia'}) }}">Indonesia</a></li>
+                                <li><a href="{{path('country', {country: 'Argentina'}) }}">Argentina</a></li>
+                                <li><a href="{{path('country', {country: 'UK'}) }}">UK</a></li>
+                                <li><a href="{{path('country', {country: 'France'}) }}">France</a></li>
+                                <li><a href="{{path('country', {country: 'French-Polynesia'}) }}">French-Polynesia</a></li> #}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% block body %}{% endblock %}
+    </div>
+    {% block outofContaier %}{% endblock %}
+    </body>
+    <footer class="footer py-3 bg-light mt-5">
+        <div class="container">
+            <p class="mb-1">Example of a hotel booking site in PHP with Symofny and &copy; Bootstrap</p>
+        </div>
+    </footer>
+</html>

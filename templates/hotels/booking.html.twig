@@ -1,0 +1,113 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+	<div style="
+										background-image:url('{{ asset('photos/' ~ hotel.photo) }}');
+										background-size: cover;
+									    background-position-y: center;
+									    width: 100%;
+									    height: 400px;
+										box-shadow: 0 0 15px;
+									">
+		<h1 class="text-white pl-2" style="text-shadow: 3px 3px 1px black;">{{ hotel.name }}</h1>
+	</div>
+	<div class="col-12">
+		<div class="rounded flex-md-row px-5 shadow-sm mb-5 position-relative">
+			<div class="col p-4 d-flex flex-column position-static">
+				<div>
+					<strong class="d-inline-block mb-2">{{ hotel.city }}</strong>
+					-
+					<strong class="d-inline-block mb-2">{{ hotel.country }}</strong>
+					-
+					<p class="d-inline-block text-mutted">{{ hotel.address }}</p>
+				</div>
+			</div>
+			<div class="row my-2 text-center">
+				<div class="col-md-4">
+					<h4>Description</h4>
+					{{ hotel.description }}
+				</div>
+				<div class="col-md-4">
+					<h4>Informations</h4>
+					{{ hotel.informations }}
+				</div>
+				<div class="col-md-4">
+					<h4>Characteristics</h4>
+					{{ hotel.characteristics }}
+				</div>
+			</div>
+			{% if reviews %}
+				<div class="text-mutted text-center">
+					<h4>Reviews :</h4>
+					{% for review in reviews %}
+					<div class="col-4 border rounded">
+						<strong>Rating : {{ review.rating }}/10</strong><br>
+						<em>{{ review.user }}</em>
+						<p>&laquo; {{ review.comment }} &raquo;</p>
+					</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+			<div class="mt-5">
+				<h4 class="mb-3">Reserve :</h4>
+				{{ form(booking_form) }}
+				</div>
+				<img src="{{asset('style/info.png')}}" width="15" alt=""><small class="ml-2 text-info">Rooms written in red are unavailable</small>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block outofContaier %}
+	<div class="col-12">
+		<div class="justify-content-between col-10 mx-auto mb-2">
+			<h4>{{currentMonth}}</h4>
+			<div>
+				<a href="{{ path('booking', { slug: hotel.slug, month: previousMonth, year: date('Y') | date('Y')}) }}" class="btn btn-primary">&lt;</a>
+				<a href="{{ path('booking', { slug: hotel.slug, month: nextMonth, year: date('Y') | date('Y')}) }}" class="btn btn-primary">&gt;</a>
+			</div>
+		</div>
+		<table class="table table-bordered col-10 mx-auto mb-5">
+			{% for i in 0..weeks - 1 %}
+				<tr>
+					{% for k, day in days %}
+						{% set date = start | date_modify("+" ~ (k + i *7) ~ "days") %}
+						<td class="text-center">
+							{% if i == 0 %}
+								<div>{{day}}
+									<br>
+									{{date | date('d')}}</div>
+							{% else %}
+								<div>{{date | date('d')}}</div>
+								<ul style="padding-left:10px">
+								{% endif %}
+								{% for key, booking in bookings %}
+									{% for book in booking %}
+										{% if date >= date(key) and date <= date(book.departureAt) | date_modify('-1 day') %}
+											{% for bedroom in bedrooms %}
+												{% if book.bedroomType == bedroom.type %}
+													<li style="width:max-content;list-style-type:none">
+														<small class='text-mutted text-danger'>{{bedroom.type}}</small>
+													</li>
+												{% endif %}
+											{% endfor %}
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</ul>
+						</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
+
+		<div class="col-8 mx-auto mb-3">
+			<h4>Add review</h4>
+			{% if app.user %}
+				{{ form(review_form) }}
+			{% else %}
+				<a class="btn btn-info" href="{{ path('app_login') }}">Se connecter</a>
+			{% endif %}
+			</div>
+		</div>
+	{% endblock %}
