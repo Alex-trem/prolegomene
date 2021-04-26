@@ -32,10 +32,11 @@ class Booking
      */
     public $departureAt;
 
-    /**
-     * @ORM\Column(type="integer")
+   /**
+     * @ORM\ManyToOne(targetEntity=Hotel::class)
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $hotelId;
+    private $hotel;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -43,9 +44,10 @@ class Booking
     public $bedroomType;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="bookings")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $userId;
+    private $user;
 
     public function __construct()
     {
@@ -99,14 +101,14 @@ class Booking
         return $this;
     }
 
-    public function getHotelId(): ?int
+    public function getHotel(): ?Hotel
     {
-        return $this->hotelId;
+        return $this->hotel;
     }
 
-    public function setHotelId(int $hotelId): self
+    public function setHotel(?Hotel $hotel): self
     {
-        $this->hotelId = $hotelId;
+        $this->hotel = $hotel;
 
         return $this;
     }
@@ -123,14 +125,14 @@ class Booking
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(?int $userId): self
+    public function setUser(?User $user): self
     {
-        $this->userId = $userId;
+        $this->user = $user;
 
         return $this;
     }

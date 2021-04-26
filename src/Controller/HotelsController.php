@@ -15,7 +15,6 @@ use App\Repository\HotelRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\BedroomRepository;
 use App\Repository\BookingRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,7 +51,6 @@ class HotelsController extends AbstractController
         BookingRepository $bookingRepo, 
         BedroomRepository $bedroomRepo, 
         ReviewRepository $reviewRepo,
-        UserRepository $userRepository
     ): Response
     {
         $user = $this->getUser();
@@ -68,7 +66,7 @@ class HotelsController extends AbstractController
         $start = $month->getStartingDay();
         $start = $start->format('N') === '1' ? $start : $month->getStartingDay()->modify('last monday');
         $end = (clone $start)->modify('+' . (6 + 7 * ($weeks -1)) . ' days');
-        $bookings = $bookingRepo->getBookingsBetweenByDay($start, $end, $hotel->id);
+        $bookings = $bookingRepo->getBookingsBetweenByDay($start, $end, $hotel);
         if($bookings){
             foreach($bookings as $book) {
                 foreach($book as $b) {
@@ -91,24 +89,29 @@ class HotelsController extends AbstractController
         ]);
         $bookingForm->handleRequest($request);
         if ($bookingForm->isSubmitted() && $bookingForm->isValid()) {
-            $booking->setHotelId($hotel->id);
-            $booking->setUserId($user->id);
+            $booking->setHotel($hotel);
+            $booking->setUser($user);
 
             $entityManager->persist($booking);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Your booking has been registered');
 
             return $this->redirectToRoute('booking', ['slug' => $hotel, 'month' => $currentMonth, 'year' => $currentYear]);
         }
 
         //-- FORMULAIRE REVIEWS --//
 
-        $bookings = $bookingRepo->findByHotelAndUser($hotel->id, $user->id);
+        $bookingsFormUser = [];
+        if ($user){
+            $bookingsFormUser = $bookingRepo->findByHotelAndUser($hotel, $user);
+        }
         $reviewForm = $this->createForm(NullFormType::class);
 
         if (!is_null($user)) {
             $review = new Review();
             $reviewForm = $this->createForm(ReviewFormType::class, $review, [
-                'bookings' => $bookings
+                'bookings' => $bookingsFormUser
             ]);
             $reviewForm->handleRequest($request);
             if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
@@ -124,7 +127,7 @@ class HotelsController extends AbstractController
             }
         }
 
-        $reviews = $reviewRepo->findBy(['hotel' => $hotel->id]);
+        $reviews = $reviewRepo->findBy(['hotel' => $hotel]);
         // dd($reviews);
 
         return new Response($this->twig->render('hotels/booking.html.twig', [

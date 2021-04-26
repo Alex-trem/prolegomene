@@ -2,6 +2,45 @@
 
 {% block body %}
 
-{{user}}
+<table class="table my-5">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Arrival date</th>
+      <th scope="col">Departure date</th>
+      <th scope="col">Hotel</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for booking in bookings %}
+    <tr>
+      <th scope="row">{{ booking.arrivalAt | date('Y-m-d') }}</th>
+      <th scope="row">{{ booking.departureAt | date('Y-m-d') }}</th>
+      <th scope="row">{{ booking.hotel }}</th>
+    </tr>
+{% endfor %}
+</table>
+
+
+
+<table class="table my-5">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Created date</th>
+      <th scope="col">Comment</th>
+      <th scope="col">Hotel</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for review in reviews %}
+    <tr>
+      <th scope="row">{{ review.createdAt | date('Y-m-d') }}</th>
+      <th scope="row">{{ review.comment }}</th>
+      <th scope="row">{{ review.hotel }}</th>
+    </tr>
+{% endfor %}
+</table>
+
+
 
 {% endblock %}

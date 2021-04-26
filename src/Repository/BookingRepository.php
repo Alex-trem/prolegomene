@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use App\Entity\Booking;
+use App\Entity\Hotel;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -24,15 +25,15 @@ class BookingRepository extends ServiceEntityRepository
      * Récupère les évènements commençant entre 2 dates
      * @param \DateTime $start
      * @param \DateTime $end
-     * @param int $hotelId
+     * @param Hotel $hotelId
      * @return Booking[]
      */
-    public function getBookingsBetween (\DateTime $start, \DateTime $end, int $hotelId) 
+    public function getBookingsBetween (\DateTime $start, \DateTime $end, Hotel $hotel) 
     {
         return $this->createQueryBuilder('b')
             ->andWhere("b.arrivalAt BETWEEN '{$start->format('Y-m-d')}' AND '{$end->format('Y-m-d')}'")
-            ->andWhere("b.hotelId = :hotelId")
-            ->setParameter("hotelId", $hotelId)
+            ->andWhere("b.hotel = :hotel")
+            ->setParameter("hotel", $hotel)
             ->getQuery()
             ->getResult()
             ;
@@ -42,12 +43,12 @@ class BookingRepository extends ServiceEntityRepository
      * Récupère les évènements commençant entre 2 dates indexé par jour
      * @param \DateTime $start
      * @param \DateTime $end
-     * @param int $hotelId
+     * @param Hotel $hotel
      * @return array
      */
-    public function getBookingsBetweenByDay (\DateTime $start, \DateTime $end, int $hotelId): ?array 
+    public function getBookingsBetweenByDay (\DateTime $start, \DateTime $end, Hotel $hotel): ?array 
     {
-        $bookings = $this->getBookingsBetween($start, $end, $hotelId);
+        $bookings = $this->getBookingsBetween($start, $end, $hotel);
         if(!$bookings){
             return null;
         } 
@@ -63,13 +64,20 @@ class BookingRepository extends ServiceEntityRepository
         return $days;
     }
 
-    public function findByHotelAndUser(int $hotelId, int $userId)
+    /**
+     * Undocumented function
+     *
+     * @param Hotel $hotel
+     * @param User $user
+     * @return void
+     */
+    public function findByHotelAndUser(Hotel $hotel, User $user)
     {
         return $this->createQueryBuilder('b')
-            ->andWhere('b.hotelId = :hotelId')
-            ->andWhere('b.userId = :userId')
-            ->setParameter('hotelId', $hotelId)
-            ->setParameter('userId', $userId)
+            ->andWhere('b.hotel = :hotel')
+            ->andWhere('b.user = :user')
+            ->setParameter('hotel', $hotel)
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult()
             ;

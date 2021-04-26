@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\BookingRepository;
+use App\Repository\ReviewRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,14 +11,21 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     #[Route('/user', name: 'user')]
-    public function index(): Response
+    public function index(BookingRepository $bookingRepo, ReviewRepository $reviewRepo): Response
     {
-        if (is_null($this->getUser())){
+        $user = $this->getUser();
+
+        if (is_null($user)){
             return $this->redirectToRoute('home');
         }
+
+        $bookings = $bookingRepo->findBy(['user' => $user]);
+        $reviews = $reviewRepo->findBy(['user' => $user]);
         
         return $this->render('user/index.html.twig', [
-            'user' => $this->getUser()
+            'user' => $user,
+            'bookings' => $bookings,
+            'reviews' => $reviews,
         ]);
     }
 }

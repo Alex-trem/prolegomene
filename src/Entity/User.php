@@ -183,7 +183,7 @@ class User implements UserInterface
     {
         if (!$this->bookings->contains($booking)) {
             $this->bookings[] = $booking;
-            $booking->setUserId($this->id);
+            $booking->setUser($this);
         }
 
         return $this;
@@ -193,8 +193,8 @@ class User implements UserInterface
     {
         if ($this->bookings->removeElement($booking)) {
             // set the owning side to null (unless already changed)
-            if ($booking->getUserId() === $this->id) {
-                $booking->setUserId(null);
+            if ($booking->getUser() === $this) {
+                $booking->setUser(null);
             }
         }
 
