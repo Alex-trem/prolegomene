@@ -20,12 +20,12 @@
     {% endfor %}
     </div>
 
-    <div class="d-flex justify-content-arround">
+    <div class="d-flex justify-content-between">
     {% if previous %}
-        <a href="{{ path('home', { offset: previous }) }}">Previous</a>
+        <a href="{{ path('home', { offset: previous }) }}" class="btn btn-outline-primary"><img src="{{ asset('style/previous.png') }}" height="10" class="mr-3" alt="">Previous</a>
     {% endif %}
     {% if next < hotels|length %}
-        <a href="{{ path('home', { offset: next }) }}">Next</a>
+        <a href="{{ path('home', { offset: next }) }}" class="btn btn-outline-primary">Next<img src="{{ asset('style/next.png') }}" height="10" class="ml-3" alt=""></a>
     {% endif %}
     </div>
     

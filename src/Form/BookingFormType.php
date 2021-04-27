@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 
@@ -20,7 +21,16 @@ class BookingFormType extends AbstractType
         $bedrooms = $options['bedrooms'];
 
         $builder
-            ->add('customers', IntegerType::class)
+            ->add('customers', ChoiceType::class, [
+                'choices' => [
+                        1 => 1,
+                        2 => 2,
+                        3 => 3,
+                        4 => 4,
+                        5 => 5,
+                        6 => 6,
+                ]
+            ])
             ->add('bedroomType', EntityType::class, [
                 'class' => Bedroom::class,
                 'choices' => $bedrooms,

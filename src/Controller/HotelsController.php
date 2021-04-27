@@ -15,6 +15,7 @@ use App\Repository\HotelRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\BedroomRepository;
 use App\Repository\BookingRepository;
+use App\Validator\BookingValidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,16 +52,17 @@ class HotelsController extends AbstractController
         BookingRepository $bookingRepo, 
         BedroomRepository $bedroomRepo, 
         ReviewRepository $reviewRepo,
+        BookingValidator $bookingValidator
     ): Response
     {
         $user = $this->getUser();
 
         //-- CALENDRIER --//
 
-        $curentMonth = (int) $request->attributes->get('month');
+        $currentMonth = (int) $request->attributes->get('month');
         $currentYear = (int) $request->attributes->get('year');
-        $month = new Month($curentMonth ?? null, $currentYear ?? null);
-        $currentMonth = $month->toString();
+        $month = new Month($currentMonth ?? null, $currentYear ?? null);
+        $currentMonthCalendar = $month->toString();
         $weeks = $month->getWeeks();
         $days = $month->days;
         $start = $month->getStartingDay();
@@ -91,6 +93,22 @@ class HotelsController extends AbstractController
         if ($bookingForm->isSubmitted() && $bookingForm->isValid()) {
             $booking->setHotel($hotel);
             $booking->setUser($user);
+
+            if ($booking->arrivalAt->format('Y-m-d') < (new \DateTime())->format('Y-m-d')){
+                $this->addFlash('danger', 'The date can\'t be in the past');
+                return $this->redirectToRoute('booking', ['slug' => $hotel, 'month' => $currentMonth, 'year' => $currentYear]);
+            }
+
+            $keys[] = $booking->arrivalAt->format('Y-m-d');
+            $keys[] = $booking->bedroomType;
+
+            $existingBookings = $bookingValidator->exists($booking, $hotel);
+            foreach ($existingBookings as $existingBooking){
+                if (array_values($keys) === array_values($existingBooking)) {
+                    $this->addFlash('danger', 'This room is no longer available for these dates');
+                    return $this->redirectToRoute('booking', ['slug' => $hotel, 'month' => $currentMonth, 'year' => $currentYear]);
+                }
+            }
 
             $entityManager->persist($booking);
             $entityManager->flush();
@@ -132,7 +150,7 @@ class HotelsController extends AbstractController
 
         return new Response($this->twig->render('hotels/booking.html.twig', [
             'hotel' => $hotel,
-            'currentMonth' => $currentMonth,
+            'currentMonth' => $currentMonthCalendar,
             'weeks' => $weeks,
             'days' => $days,
             'start' => $start,

@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\ReviewRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ReviewRepository;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
@@ -19,6 +21,7 @@ class Review
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Range(min=0, max=10)
      */
     private $rating;
 

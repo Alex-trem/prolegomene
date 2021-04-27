@@ -83,6 +83,16 @@ class BookingRepository extends ServiceEntityRepository
             ;
     }
 
+    public function findAllArray(Hotel $hotel)
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.hotel = :hotel')
+            ->setParameter('hotel', $hotel)
+            ->getQuery()
+            ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY)
+            ;
+    }
+
     // /**
     //  * @return Booking[] Returns an array of Booking objects
     //  */

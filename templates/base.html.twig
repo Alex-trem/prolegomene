@@ -54,7 +54,8 @@
                 </div>
                 <div>
                 {% if app.user %}
-                    <a class="badge badge-light" href="{{ path('user') }}">Account</a>
+                    <a class="badge badge-light p-2" href="{{ path('user') }}">Account</a>
+                    <a class="badge badge-danger p-2" href="{{ path('app_logout') }}">Log out</a>
                 {% else %}
                     <a class="badge badge-light" href="{{ path('app_login') }}">Log in</a>
                 {% endif %}

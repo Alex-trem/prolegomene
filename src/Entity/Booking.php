@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\BookingRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\BookingRepository;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=BookingRepository::class)
+ * @UniqueEntity(fields={"arrivalAt", "hotel", "bedroomType"})
  */
 class Booking
 {
@@ -19,6 +22,7 @@ class Booking
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Range(min=0, max=6)
      */
     private $customers;
 
