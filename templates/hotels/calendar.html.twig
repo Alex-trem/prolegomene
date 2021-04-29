@@ -1,0 +1,64 @@
+<div class="calendar">
+	<div class="col-12">
+		<div class="justify-content-between col-10 mx-auto mb-2">
+			<h4>{{currentMonth}}</h4>
+		</div>
+		<table class="table table-bordered col-10 mx-auto mb-5">
+			{% for i in 0..weeks - 1 %}
+				<tr>
+					{% for k, day in days %}
+						{% set date = start | date_modify("+" ~ (k + i *7) ~ "days") %}
+						<td class="text-center">
+							{% if i == 0 %}
+								<div>{{day}}
+									<br>
+									{{date | date('d')}}</div>
+							{% else %}
+								<div>{{date | date('d')}}</div>
+								<ul style="padding-left:10px">
+								{% endif %}
+								{% for key, booking in bookings %}
+									{% for book in booking %}
+										{% if date >= date(key) and date <= date(book.departureAt) | date_modify('-1 day') %}
+											{% for bedroom in bedrooms %}
+												{% if book.bedroomType == bedroom.type %}
+													<li style="width:max-content;list-style-type:none">
+														<small class='text-mutted text-danger'>{{bedroom.type}}</small>
+													</li>
+												{% endif %}
+											{% endfor %}
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							</ul>
+						</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+
+{# <div class="row">
+<div class="col-6">
+<h1>days</h1>
+{{dump(days)}}
+</div>
+<div class="col-6">
+<h1>makes</h1>
+{{dump(week_days_names)}}
+</div>
+</div> #}
+
+{# <table class="table table-bordered col-10 mx-auto mb-5">
+	{% for i in 0..nbDeSemaines -1 %}
+		<tr>
+	{% for k, day in week_days_names %}
+			<td>
+			{% set date = start | date_modify("+" ~ (k + i *7) ~ "days") %}
+			{{ date | date('d') }}
+			</td>
+	{% endfor %}
+		</tr>
+	{% endfor %}
+</table> #}

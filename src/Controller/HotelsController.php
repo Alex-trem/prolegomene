@@ -2,24 +2,25 @@
 
 namespace App\Controller;
 
-use App\Calendar\Month;
 use App\Entity\Hotel;
 use Twig\Environment;
 use App\Entity\Review;
-use App\Entity\Bedroom;
+use App\Calendar\Month;
 use App\Entity\Booking;
+use App\Calendar\Calendar;
 use App\Form\NullFormType;
 use App\Form\ReviewFormType;
 use App\Form\BookingFormType;
 use App\Repository\HotelRepository;
+use App\Validator\BookingValidator;
 use App\Repository\ReviewRepository;
 use App\Repository\BedroomRepository;
 use App\Repository\BookingRepository;
-use App\Validator\BookingValidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HotelsController extends AbstractController
@@ -44,7 +45,7 @@ class HotelsController extends AbstractController
         ]);
     }
 
-    #[Route('/booking/{slug}/{month}/{year}', name:'booking')]
+    #[Route('/booking/{slug}', name:'booking')]
     public function booking(
         Request $request, 
         EntityManagerInterface $entityManager, 
@@ -59,8 +60,8 @@ class HotelsController extends AbstractController
 
         //-- CALENDRIER --//
 
-        $currentMonth = (int) $request->attributes->get('month');
-        $currentYear = (int) $request->attributes->get('year');
+        $currentMonth = (new \DateTime())->format('m');
+        $currentYear = (new \DateTime())->format('Y');
         $month = new Month($currentMonth ?? null, $currentYear ?? null);
         $currentMonthCalendar = $month->toString();
         $weeks = $month->getWeeks();
@@ -80,6 +81,53 @@ class HotelsController extends AbstractController
         $dispo = '';
         if(isset($unavailableBedrooms)){
             $dispo = sizeof($bedrooms) - sizeof($unavailableBedrooms);
+        }
+
+        $calendar = new Calendar();
+        $make = $calendar->make();
+        // $cell = $make['cells'];
+        // $week_days_names = $make['week_days_names'];
+        // $nbDeSemaines = ceil($calendar->get_days_count_in_month($make['year'], $make['month']) / 7);
+        $dataPrevMonth = $calendar->get_prev_month($make['year'], $make['month']);
+        $dataNextMonth = $calendar->get_next_month($make['year'], $make['month']);
+
+        if ($request->get('ajax')){
+            $currentMonth = (int) $request->get('month');
+            $currentYear = (int) $request->get('year');
+            $month = new Month($currentMonth, $currentYear);
+            $currentMonthCalendar = $month->toString();
+            $weeks = $month->getWeeks();
+            $days = $month->days;
+            $start = $month->getStartingDay();
+            $start = $start->format('N') === '1' ? $start : $month->getStartingDay()->modify('last monday');
+            $end = (clone $start)->modify('+' . (6 + 7 * ($weeks -1)) . ' days');
+            $bookings = $bookingRepo->getBookingsBetweenByDay($start, $end, $hotel);
+            if($bookings){
+                foreach($bookings as $book) {
+                    foreach($book as $b) {
+                        $unavailableBedrooms[] = $b->bedroomType;
+                    }
+                }
+            }
+            $bedrooms = $bedroomRepo->findAll();
+            $dispo = '';
+            if(isset($unavailableBedrooms)){
+                $dispo = sizeof($bedrooms) - sizeof($unavailableBedrooms);
+            }
+
+            return new JsonResponse(['content' => $this->twig->render('hotels/calendar.html.twig', [
+                'dataNextMonth' => $dataNextMonth,
+                'dataPrevMonth' => $dataPrevMonth,
+                'currentMonth' => $currentMonthCalendar,
+                'hotel' => $hotel,
+                'previousMonth' => $month->previousMonth()->month,
+                'nextMonth' => $month->nextMonth()->month,
+                'days' => $days,
+                'start' => $start,
+                'bookings' => $bookings,
+                'bedrooms' => $bedrooms,
+                'weeks' => $weeks,
+            ])]);
         }
         
         //-- FORMULAIRE BOOKING --//
@@ -148,7 +196,11 @@ class HotelsController extends AbstractController
         $reviews = $reviewRepo->findBy(['hotel' => $hotel]);
         // dd($reviews);
 
+        
+
         return new Response($this->twig->render('hotels/booking.html.twig', [
+            'dataNextMonth' => $dataNextMonth,
+            'dataPrevMonth' => $dataPrevMonth,
             'hotel' => $hotel,
             'currentMonth' => $currentMonthCalendar,
             'weeks' => $weeks,
