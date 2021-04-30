@@ -69,9 +69,9 @@ class BookingRepository extends ServiceEntityRepository
      *
      * @param Hotel $hotel
      * @param User $user
-     * @return void
+     * @return array
      */
-    public function findByHotelAndUser(Hotel $hotel, User $user)
+    public function findByHotelAndUser(Hotel $hotel, User $user): array
     {
         return $this->createQueryBuilder('b')
             ->andWhere('b.hotel = :hotel')

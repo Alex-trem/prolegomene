@@ -18,13 +18,13 @@ class Booking
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    public $id;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\Range(min=0, max=6)
      */
-    private $customers;
+    public $customers;
 
     /**
      * @ORM\Column(type="datetime")

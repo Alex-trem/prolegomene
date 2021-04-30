@@ -62,13 +62,8 @@
 {% endblock %}
 
 {% block outofContaier %}
-	<div id="theCalendar">
-		{% include "hotels/calendar.html.twig" %}
+	<div id="theCalendar" class="col-8 mx-auto">
 	</div>
-	<form id="navCalendar">
-		<input type="button" href="#" class="btn btn-primary" id="prevMonth" month="{{ dataPrevMonth.m }}" year="{{ dataPrevMonth.y }}" value="&lt;">
-		<input type="button" href="#" class="btn btn-primary" id="nextMonth" month="{{ dataNextMonth.m }}" year="{{ dataNextMonth.y }}" value="&gt;">
-	</form>
 	
 
 	<div class="col-8 mx-auto mb-3" id="form-review">
@@ -81,3 +76,17 @@
 		</div>
 	</div>
 	{% endblock %}
+
+
+{% block js %}
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var calendarEl = document.getElementById('theCalendar');
+			let calendar = new FullCalendar.Calendar(calendarEl, {
+			initialView: 'dayGridMonth',
+			events: {{ bookingsData|raw }}
+			});
+			calendar.render();
+		});
+	</script>
+{% endblock %}

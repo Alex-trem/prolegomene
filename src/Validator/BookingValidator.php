@@ -34,16 +34,19 @@ class BookingValidator extends ConstraintValidator
     {
         $validBookings = $this->bookingRepo->findAllArray($hotel);
 
-        foreach ($validBookings as $validBooking){
-            $validBooks[] = array_filter($validBooking, function ($key) {
-                return in_array($key, ['arrivalAt', 'bedroomType']);
-            }, ARRAY_FILTER_USE_KEY);
+        if ($validBookings){
+            foreach ($validBookings as $validBooking){
+                $validBooks[] = array_filter($validBooking, function ($key) {
+                    return in_array($key, ['arrivalAt', 'bedroomType']);
+                }, ARRAY_FILTER_USE_KEY);
+            }
+            
+            foreach ($validBooks as $key => $validBook){
+                $validBooks[$key]['arrivalAt'] = $validBook['arrivalAt']->format('Y-m-d');
+            }
+            return $validBooks;
         }
 
-        foreach ($validBooks as $key => $validBook){
-            $validBooks[$key]['arrivalAt'] = $validBook['arrivalAt']->format('Y-m-d');
-        }
-        
-        return $validBooks;
+        return null;
     }
 }
