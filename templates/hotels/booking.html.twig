@@ -66,9 +66,10 @@
 		{% include "hotels/calendar.html.twig" %}
 	</div>
 	<form id="navCalendar">
-		<input type="button" href="#" class="btn btn-primary previousMonth" month="{{ dataPrevMonth.m }}" year="{{ dataPrevMonth.y }}" value="&lt;">
-		<input type="button" href="#" class="btn btn-primary nextMonth" month="{{ dataNextMonth.m }}" year="{{ dataNextMonth.y }}" value="&gt;">
+		<input type="button" href="#" class="btn btn-primary" id="prevMonth" month="{{ dataPrevMonth.m }}" year="{{ dataPrevMonth.y }}" value="&lt;">
+		<input type="button" href="#" class="btn btn-primary" id="nextMonth" month="{{ dataNextMonth.m }}" year="{{ dataNextMonth.y }}" value="&gt;">
 	</form>
+	
 
 	<div class="col-8 mx-auto mb-3" id="form-review">
 		<h4>Add review</h4>

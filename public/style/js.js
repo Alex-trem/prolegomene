@@ -15,36 +15,18 @@ td.forEach(element => {
 });
 
 
-// (function ($) {
-//     $('.navCalendar').on('click', function (e){
-//         e.preventDefault();
-//         var $a = $(this);
-//         var url = window.location.href;
-//         $.post(url, {
-//                 month: jQuery(this).data('month'),
-//                 year: jQuery(this).data('year')
-//             }, 'text')
-//             .done(function(data, text, jqxhr){
-//                 $('.calendar').replaceWith(jqxhr.responseText)
-//             })
-//             .fail(function(jqxhr){
-//                 console.log(jqxhr);
-//             });
-//     });
-// })(jQuery);
-
-
-window.onload = () => {
+(function () {
     const form = document.querySelector('#navCalendar')
     
     document.querySelectorAll('#navCalendar input').forEach(input => {
         input.addEventListener('click', function (e){
             const month = input.attributes.month.value
             const year = input.attributes.year.value
+            const inputId = input.attributes.id
             const Params = new URLSearchParams();
             Params.append('month', month);
             Params.append('year', year);
-
+            
             const url = new URL(window.location.href);
             fetch(url.pathname + '?ajax=1&' + Params.toString(), {
                 headers: {
@@ -52,12 +34,16 @@ window.onload = () => {
                 }
             }).then(response => 
                 response.json()
-            ).then(data => {
-                const content = document.querySelector('#theCalendar');
-                content.innerHTML = data.content;
-                history.pushState({}, null, url.pathname + '?' + Params.toString());
+                ).then(data => {
+                    const dataNav = data.content.substr(-220);
+                    const numberPattern = /\d+/g;
+                    document.querySelector('#prevMonth').setAttribute('month', dataNav.substr(148, 4).match(numberPattern).join(''));
+                    document.querySelector('#nextMonth').setAttribute('month', dataNav.substr(193, 4).match(numberPattern).join(''));
+                    const content = document.querySelector('#theCalendar');
+                    content.innerHTML = data.content;
+                    history.pushState({}, null, url.pathname + '?' + Params.toString());
+                }).catch(e => console.log(e));
             });
         });
-    });
-}
+})();
 

@@ -30,7 +30,6 @@ class CalendarCell {
         }
         ?>
 
-        <span class="pn_cal_cell_ev_counter" <?php if ($this_day_events <= 0): ?>style="display: none;"<?php endif; ?>><?php echo $this_day_events ?></span>
         <a  data-year="<?php echo $this->cell_year ?>" 
             data-month="<?php echo $this->cell_month ?>" 
             data-day="<?php echo $this->cell_day ?>" 

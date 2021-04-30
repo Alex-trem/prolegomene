@@ -141,7 +141,7 @@ class Calendar {
         return $cells;
     }
 
-    public function get_next_month($year, $month) {
+    public function get_next_month($month, $year) {
         $year = intval($year);
         $month = intval($month);
 
@@ -155,7 +155,7 @@ class Calendar {
         return array('y' => $year, 'm' => $month);
     }
 
-    public function get_prev_month($year, $month) {
+    public function get_prev_month($month, $year) {
         $year = intval($year);
         $month = intval($month);
 

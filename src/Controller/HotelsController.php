@@ -60,9 +60,11 @@ class HotelsController extends AbstractController
 
         //-- CALENDRIER --//
 
+        $params['month'] = $request->get('month');
+        $params['year'] = $request->get('year');
         $currentMonth = (new \DateTime())->format('m');
         $currentYear = (new \DateTime())->format('Y');
-        $month = new Month($currentMonth ?? null, $currentYear ?? null);
+        $month = new Month($params['month'] ?? $currentMonth, $params['year'] ?? $currentYear);
         $currentMonthCalendar = $month->toString();
         $weeks = $month->getWeeks();
         $days = $month->days;
@@ -88,8 +90,8 @@ class HotelsController extends AbstractController
         // $cell = $make['cells'];
         // $week_days_names = $make['week_days_names'];
         // $nbDeSemaines = ceil($calendar->get_days_count_in_month($make['year'], $make['month']) / 7);
-        $dataPrevMonth = $calendar->get_prev_month($make['year'], $make['month']);
-        $dataNextMonth = $calendar->get_next_month($make['year'], $make['month']);
+        $dataPrevMonth = $calendar->get_prev_month($params['month'] ?? $currentMonth, $params['year'] ?? $currentYear);
+        $dataNextMonth = $calendar->get_next_month($params['month'] ?? $currentMonth, $params['year'] ?? $currentYear);
 
         if ($request->get('ajax')){
             $currentMonth = (int) $request->get('month');
@@ -114,6 +116,9 @@ class HotelsController extends AbstractController
             if(isset($unavailableBedrooms)){
                 $dispo = sizeof($bedrooms) - sizeof($unavailableBedrooms);
             }
+
+            $dataPrevMonth = $calendar->get_prev_month($currentMonth, $currentYear);
+            $dataNextMonth = $calendar->get_next_month($currentMonth, $currentYear);
 
             return new JsonResponse(['content' => $this->twig->render('hotels/calendar.html.twig', [
                 'dataNextMonth' => $dataNextMonth,
