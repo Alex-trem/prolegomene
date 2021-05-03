@@ -34,9 +34,20 @@ class BookingFormType extends AbstractType
             ->add('bedroomType', EntityType::class, [
                 'class' => Bedroom::class,
                 'choices' => $bedrooms,
+                'placeholder' => 'Choose a room',
+                'attr' => [
+                    'onchange' => 'verif(this.value)'
+                ],
             ])
-            ->add('arrivalAt', DateType::class)
-            ->add('departureAt', DateType::class)
+            ->add('arrivalAt', DateType::class, [
+                'format' => 'yyyy-MM-dd',
+                'attr' => [
+                    'onchange' => 'verif()'
+                ],
+            ])
+            ->add('departureAt', DateType::class, [
+                'format' => 'yyyy-MM-dd'
+            ])
             ->add('Reserve', SubmitType::class)
         ;
     }

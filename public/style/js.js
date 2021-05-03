@@ -13,5 +13,3 @@ td.forEach(element => {
         }
     }
 });
-
-

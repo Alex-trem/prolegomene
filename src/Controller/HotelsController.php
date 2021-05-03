@@ -43,19 +43,18 @@ class HotelsController extends AbstractController
         ]);
     }
 
-    #[Route('/booking/{slug}', name:'booking')]
+    #[Route('/booking/{slug}', name: 'booking')]
     public function booking(
-        Request $request, 
-        EntityManagerInterface $entityManager, 
-        Hotel $hotel, 
-        BookingRepository $bookingRepo, 
-        BedroomRepository $bedroomRepo, 
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Hotel $hotel,
+        BookingRepository $bookingRepo,
+        BedroomRepository $bedroomRepo,
         ReviewRepository $reviewRepo,
         BookingValidator $bookingValidator
-    ): Response
-    {
+    ): Response {
         $user = $this->getUser();
-        
+
         //-- FORMULAIRE BOOKING --//
 
         $bedrooms = $bedroomRepo->findAll();
@@ -68,7 +67,7 @@ class HotelsController extends AbstractController
             $booking->setHotel($hotel);
             $booking->setUser($user);
 
-            if ($booking->arrivalAt->format('Y-m-d') < (new \DateTime())->format('Y-m-d')){
+            if ($booking->arrivalAt->format('Y-m-d') < (new \DateTime())->format('Y-m-d')) {
                 $this->addFlash('danger', 'The date can\'t be in the past');
                 return $this->redirectToRoute('booking', ['slug' => $hotel]);
             }
@@ -78,7 +77,7 @@ class HotelsController extends AbstractController
 
             $existingBookings = $bookingValidator->exists($booking, $hotel);
             if ($existingBookings) {
-                foreach ($existingBookings as $existingBooking){
+                foreach ($existingBookings as $existingBooking) {
                     if (array_values($keys) === array_values($existingBooking)) {
                         $this->addFlash('danger', 'This room is no longer available for these dates');
                         return $this->redirectToRoute('booking', ['slug' => $hotel]);
@@ -100,44 +99,82 @@ class HotelsController extends AbstractController
         if ($user){
             $bookingsFormUser = $bookingRepo->findByHotelAndUser($hotel, $user);
         }
-        $reviewForm = $this->createForm(NullFormType::class);
-
-        if (!is_null($user)) {
-            $review = new Review();
-            $reviewForm = $this->createForm(ReviewFormType::class, $review, [
-                'bookings' => $bookingsFormUser
-            ]);
-            $reviewForm->handleRequest($request);
-            if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
-                $review->setHotel($hotel);
+    
+        $review = new Review();
+        $reviewForm = $this->createForm(ReviewFormType::class, $review, [
+            'bookings' => $bookingsFormUser
+        ]);
+        $reviewForm->handleRequest($request);
+        if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
+            $review->setHotel($hotel);
+            if ($user){
                 $review->setUser($user);
-
-                $entityManager->persist($review);
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Your comment has been published');
-
-                return $this->redirectToRoute('booking', ['slug' => $hotel]);
             }
+
+            $entityManager->persist($review);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Your comment has been published');
+
+            return $this->redirectToRoute('booking', ['slug' => $hotel]);
         }
+
 
         $reviews = $reviewRepo->findBy(['hotel' => $hotel]);
 
         //-- CALENDRIER --//
 
         $bookingsFound = $bookingRepo->findAll();
-        if ($bookingsFound){
-            foreach ($bookingsFound as $booking){
-                $bookings[] = [
-                    'id' => $booking->id,
+        $bookingsByDay = [];
+        foreach ($bookingsFound as $booking) {
+            $date = $booking->arrivalAt->format('Y-m-d');
+            if (empty($bookingsByDay[$date])) {
+                $bookingsByDay[$date][0] = [
                     'start' => $booking->arrivalAt->format('Y-m-d'),
                     'end' => $booking->departureAt->format('Y-m-d'),
-                    'customers' => $booking->customers,
                     'title' => $booking->bedroomType,
                 ];
+            } else {
+                array_push($bookingsByDay[$date], [
+                    'start' => $booking->arrivalAt->format('Y-m-d'),
+                    'end' => $booking->departureAt->format('Y-m-d'),
+                    'title' => $booking->bedroomType,
+                ]);
             }
         }
-        $bookingsData = json_encode($bookings);
+
+        if (!empty($bookingsByDay)){
+            foreach ($bookingsByDay as $key => $bookings){
+                if (sizeof($bookings) === 3){
+                    foreach ($bookings as $k => $booking){
+                        $bookingsByDay[$key][$k]['backgroundColor'] = 'orange';
+                        $bookingsByDay[$key][$k]['borderColor'] = 'orange';
+                        $bookingsByDay[$key][$k]['textColor'] = 'black';
+                    }
+                } elseif (sizeof($bookings) === 6){
+                    foreach ($bookings as $k => $booking){
+                        $bookingsByDay[$key][$k]['backgroundColor'] = 'red';
+                        $bookingsByDay[$key][$k]['borderColor'] = 'red';
+                        $bookingsByDay[$key][$k]['textColor'] = 'black';
+                    }
+                }
+            }
+            foreach ($bookingsByDay as $bookings){
+                foreach ($bookings as $booking){
+                    $bookingsData[] = $booking;
+                }
+            }
+        }
+        
+        foreach($bookingsData as $booking){
+            $unavailables[] = [
+                'date' => $booking['start'],
+                'type' => $booking['title']
+            ];
+        }
+
+        $bookingsData = json_encode($bookingsData);
+        $unavailables = json_encode($unavailables);
 
         return new Response($this->twig->render('hotels/booking.html.twig', [
             'hotel' => $hotel,
@@ -146,6 +183,7 @@ class HotelsController extends AbstractController
             'review_form' => $reviewForm->createView(),
             'reviews' => $reviews,
             'bookingsData' => $bookingsData,
+            'dataB' => $unavailables
         ]));
     }
 }

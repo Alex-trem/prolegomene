@@ -53,7 +53,7 @@
 			{% endif %}
 			<div class="mt-5">
 				<h4 class="mb-3">Reserve :</h4>
-				{{ form(booking_form) }}
+					{{ form(booking_form) }}
 				</div>
 				<img src="{{asset('style/info.png')}}" width="15" alt=""><small class="ml-2 text-info">Rooms written in red are unavailable</small>
 			</div>
@@ -83,10 +83,69 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			var calendarEl = document.getElementById('theCalendar');
 			let calendar = new FullCalendar.Calendar(calendarEl, {
-			initialView: 'dayGridMonth',
-			events: {{ bookingsData|raw }}
+				initialView: 'dayGridMonth',
+				height: 600,
+				default: false,
+				headerToolbar: {
+					end: 'prev,next',
+				},
+				events: {{ bookingsData|raw }},
 			});
 			calendar.render();
 		});
+
+		
+
+	function verif(element){
+		var date = '';
+		var type = '';
+		var select = document.querySelectorAll('#booking_form_arrivalAt select')
+		select.forEach(element => {
+			if (element.value.length == 1){
+				date += 0 + element.value + '-'
+			} else {
+				date += element.value + '-'
+			}
+			date = date.substr(0, 10)
+		});
+
+		if (element) {
+			type = element;
+		} else {
+			type = document.querySelector('#booking_form_bedroomType')
+			type = type.value
+		}
+		switch(type) {
+			case '1':
+				type = "Single Room";
+				break;
+			case '2':
+				type = "Double Room";
+				break;
+			case '3':
+				type = "Triple Room";
+				break;
+			case '4':
+				type = "Quadruple Room";
+				break;
+			case '5':
+				type = "Superior Double Room";
+				break;
+			case '6':
+				type = "Deluxe Double Room";
+				break;
+		};
+
+		{{dataB|raw}}.forEach(data => {
+			if(data.date + data.type == date + type){
+				$('#booking_form_bedroomType').addClass("is-invalid")
+				$('#booking_form_arrivalAt select').addClass("is-invalid")
+			} 
+			if (data.date + data.type != date + type){
+				$('#booking_form_bedroomType').removeClass("is-invalid")
+				$('#booking_form_arrivalAt select').removeClass("is-invalid")
+			}
+		});
+	};
 	</script>
 {% endblock %}
