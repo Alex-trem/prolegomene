@@ -95,14 +95,13 @@ class HotelsController extends AbstractController
 
         //-- FORMULAIRE REVIEWS --//
 
-        $bookingsFormUser = [];
+        $bookingsOfUser = [];
         if ($user){
-            $bookingsFormUser = $bookingRepo->findByHotelAndUser($hotel, $user);
+            $bookingsOfUser = $bookingRepo->findByHotelAndUser($hotel, $user);
         }
-    
         $review = new Review();
         $reviewForm = $this->createForm(ReviewFormType::class, $review, [
-            'bookings' => $bookingsFormUser
+            'bookings' => $bookingsOfUser
         ]);
         $reviewForm->handleRequest($request);
         if ($reviewForm->isSubmitted() && $reviewForm->isValid()) {
@@ -124,57 +123,9 @@ class HotelsController extends AbstractController
 
         //-- CALENDRIER --//
 
-        $bookingsFound = $bookingRepo->findAll();
-        $bookingsByDay = [];
-        foreach ($bookingsFound as $booking) {
-            $date = $booking->arrivalAt->format('Y-m-d');
-            if (empty($bookingsByDay[$date])) {
-                $bookingsByDay[$date][0] = [
-                    'start' => $booking->arrivalAt->format('Y-m-d'),
-                    'end' => $booking->departureAt->format('Y-m-d'),
-                    'title' => $booking->bedroomType,
-                ];
-            } else {
-                array_push($bookingsByDay[$date], [
-                    'start' => $booking->arrivalAt->format('Y-m-d'),
-                    'end' => $booking->departureAt->format('Y-m-d'),
-                    'title' => $booking->bedroomType,
-                ]);
-            }
-        }
+        $bookingsData = $bookingRepo->getBookingsData();
 
-        if (!empty($bookingsByDay)){
-            foreach ($bookingsByDay as $key => $bookings){
-                if (sizeof($bookings) === 3){
-                    foreach ($bookings as $k => $booking){
-                        $bookingsByDay[$key][$k]['backgroundColor'] = 'orange';
-                        $bookingsByDay[$key][$k]['borderColor'] = 'orange';
-                        $bookingsByDay[$key][$k]['textColor'] = 'black';
-                    }
-                } elseif (sizeof($bookings) === 6){
-                    foreach ($bookings as $k => $booking){
-                        $bookingsByDay[$key][$k]['backgroundColor'] = 'red';
-                        $bookingsByDay[$key][$k]['borderColor'] = 'red';
-                        $bookingsByDay[$key][$k]['textColor'] = 'black';
-                    }
-                }
-            }
-            foreach ($bookingsByDay as $bookings){
-                foreach ($bookings as $booking){
-                    $bookingsData[] = $booking;
-                }
-            }
-        }
-        
-        foreach($bookingsData as $booking){
-            $unavailables[] = [
-                'date' => $booking['start'],
-                'type' => $booking['title']
-            ];
-        }
-
-        $bookingsData = json_encode($bookingsData);
-        $unavailables = json_encode($unavailables);
+        $unavailables = $bookingsData['form'];
 
         return new Response($this->twig->render('hotels/booking.html.twig', [
             'hotel' => $hotel,
@@ -182,8 +133,7 @@ class HotelsController extends AbstractController
             'booking_form' => $bookingForm->createView(),
             'review_form' => $reviewForm->createView(),
             'reviews' => $reviews,
-            'bookingsData' => $bookingsData,
-            'dataB' => $unavailables
+            'dataBookings' => $unavailables
         ]));
     }
 }

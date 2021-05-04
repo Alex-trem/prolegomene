@@ -55,17 +55,13 @@
 				<h4 class="mb-3">Reserve :</h4>
 					{{ form(booking_form) }}
 				</div>
-				<img src="{{asset('style/info.png')}}" width="15" alt=""><small class="ml-2 text-info">Rooms written in red are unavailable</small>
+				<img src="{{asset('style/info.png')}}" width="15" alt=""><small class="ml-2 text-info">If fields are red it's mean this booking is unavailable</small>
 			</div>
 		</div>
 	</div>
 {% endblock %}
 
 {% block outofContaier %}
-	<div id="theCalendar" class="col-8 mx-auto">
-	</div>
-	
-
 	<div class="col-8 mx-auto mb-3" id="form-review">
 		<h4>Add review</h4>
 			{% if app.user %}
@@ -80,33 +76,27 @@
 
 {% block js %}
 	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			var calendarEl = document.getElementById('theCalendar');
-			let calendar = new FullCalendar.Calendar(calendarEl, {
-				initialView: 'dayGridMonth',
-				height: 600,
-				default: false,
-				headerToolbar: {
-					end: 'prev,next',
-				},
-				events: {{ bookingsData|raw }},
-			});
-			calendar.render();
-		});
-
-		
-
-	function verif(element){
-		var date = '';
+	{# function verif(element){
+		var dateA = '';
+		var dateD = '';
 		var type = '';
 		var select = document.querySelectorAll('#booking_form_arrivalAt select')
 		select.forEach(element => {
 			if (element.value.length == 1){
-				date += 0 + element.value + '-'
+				dateA += 0 + element.value + '-'
 			} else {
-				date += element.value + '-'
+				dateA += element.value + '-'
 			}
-			date = date.substr(0, 10)
+			dateA = dateA.substr(0, 10)
+		});
+		var select = document.querySelectorAll('#booking_form_departureAt select')
+		select.forEach(element => {
+			if (element.value.length == 1){
+				dateD += 0 + element.value + '-'
+			} else {
+				dateD += element.value + '-'
+			}
+			dateD = dateD.substr(0, 10)
 		});
 
 		if (element) {
@@ -136,16 +126,91 @@
 				break;
 		};
 
-		{{dataB|raw}}.forEach(data => {
-			if(data.date + data.type == date + type){
+		var dataForm = dateA + dateD + type;
+		console.log(dataForm)
+		var dataB = {{dataB|json_encode()|raw}}
+		for (var i = 0; i < dataB.dateA.length; i++) {
+			data = dataB.dateA[i] + dataB.dateD[i] + dataB.type[i];
+			if (data == dataForm){
 				$('#booking_form_bedroomType').addClass("is-invalid")
 				$('#booking_form_arrivalAt select').addClass("is-invalid")
-			} 
-			if (data.date + data.type != date + type){
+			}
+			if (data != dataForm){
 				$('#booking_form_bedroomType').removeClass("is-invalid")
 				$('#booking_form_arrivalAt select').removeClass("is-invalid")
 			}
+		}
+	}; #}
+
+	function verif(element){
+		var dateFormA = '';
+		var dateFormD = '';
+		var type = '';
+		var select = document.querySelectorAll('#booking_form_arrivalAt select')
+		select.forEach(element => {
+			dateFormA += element.value + ', '
 		});
+		var comma = dateFormA.lastIndexOf(',');
+		dateFormA = new Date(dateFormA.substr(0, comma));
+
+		var select = document.querySelectorAll('#booking_form_departureAt select')
+		select.forEach(element => {
+			dateFormD += element.value + ', '
+		});
+		var comma = dateFormD.lastIndexOf(',')
+		dateFormD = new Date(dateFormD.substr(0, comma));
+
+		if (element) {
+			type = element;
+		} else {
+			type = document.querySelector('#booking_form_bedroomType')
+			type = type.value
+		}
+		switch(type) {
+			case '1':
+				type = "Single Room";
+				break;
+			case '2':
+				type = "Double Room";
+				break;
+			case '3':
+				type = "Triple Room";
+				break;
+			case '4':
+				type = "Quadruple Room";
+				break;
+			case '5':
+				type = "Superior Double Room";
+				break;
+			case '6':
+				type = "Deluxe Double Room";
+				break;
+		};
+
+		var dataForm = dateFormA + dateFormD + type;
+		var dataBookings = {{dataBookings|json_encode()|raw}}
+		for (var i = 0; i < dataBookings.dateA.length; i++) {
+			var dataA = new Date(dataBookings.dateA[i])
+			dataA = dataA.setHours(0);
+			var dataD = new Date(dataBookings.dateD[i])
+			dataD = dataD.setHours(0);
+			var dataType = dataBookings.type[i]
+			var data = dataD + dataD + dataType;
+			if (data == dataForm){
+				$('#booking_form_bedroomType').addClass("is-invalid")
+				$('#booking_form_arrivalAt select').addClass("is-invalid")
+			}
+			if (dateFormA < dataD & type == dataType){
+				$('#booking_form_bedroomType').addClass("is-invalid")
+				$('#booking_form_arrivalAt select').addClass("is-invalid")
+			}
+			if (data != dataForm){
+				$('#booking_form_bedroomType').removeClass("is-invalid")
+				$('#booking_form_arrivalAt select').removeClass("is-invalid")
+			}
+		}
 	};
+
+	
 	</script>
 {% endblock %}

@@ -39,29 +39,39 @@ class BookingRepository extends ServiceEntityRepository
             ;
     }
 
-    /**
-     * Récupère les évènements commençant entre 2 dates indexé par jour
-     * @param \DateTime $start
-     * @param \DateTime $end
-     * @param Hotel $hotel
-     * @return array
-     */
-    public function getBookingsBetweenByDay (\DateTime $start, \DateTime $end, Hotel $hotel): ?array 
+    public function getBookingsBetweenByDay ($bookings, bool $filter = false): ?array 
     {
-        $bookings = $this->getBookingsBetween($start, $end, $hotel);
-        if(!$bookings){
-            return null;
-        } 
-        $days = [];
-        foreach ($bookings as $booking) {
-            $date = $booking->arrivalAt->format('Y-m-d');
-            if (empty($days[$date])) {
-                $days[$date] = [$booking];
-            } else {
-                array_push($days[$date], $booking);
+        $bookingsByDay = [];
+        if ($filter = false) {
+            foreach ($bookings as $booking) {
+                $date = $booking->arrivalAt->format('Y-m-d');
+                if (empty($bookingsByDay[$date])) {
+                    $bookingsByDay[$date] = [$booking];
+                } else {
+                    array_push($bookingsByDay[$date], $booking);
+                }
             }
+            return $bookingsByDay;
+        } 
+        else {
+            foreach ($bookings as $booking) {
+                $date = $booking->arrivalAt->format('Y-m-d');
+                if (empty($bookingsByDay[$date])) {
+                    $bookingsByDay[$date][0] = [
+                        'start' => $booking->arrivalAt->format('Y-m-d'),
+                        'end' => $booking->departureAt->format('Y-m-d'),
+                        'title' => $booking->bedroomType,
+                    ];
+                } else {
+                    array_push($bookingsByDay[$date], [
+                        'start' => $booking->arrivalAt->format('Y-m-d'),
+                        'end' => $booking->departureAt->format('Y-m-d'),
+                        'title' => $booking->bedroomType,
+                    ]);
+                }
+            }
+            return $bookingsByDay;
         }
-        return $days;
     }
 
     /**
@@ -91,6 +101,42 @@ class BookingRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY)
             ;
+    }
+
+    public function getBookingsData(){
+        $bookingsFound = $this->findAll();
+        $bookingsByDay = $this->getBookingsBetweenByDay($bookingsFound, true);
+
+        if (!empty($bookingsByDay)){
+            foreach ($bookingsByDay as $key => $bookings){
+                if (sizeof($bookings) === 3){
+                    foreach ($bookings as $k => $booking){
+                        $bookingsByDay[$key][$k]['backgroundColor'] = 'orange';
+                        $bookingsByDay[$key][$k]['borderColor'] = 'orange';
+                        $bookingsByDay[$key][$k]['textColor'] = 'black';
+                    }
+                } elseif (sizeof($bookings) === 6){
+                    foreach ($bookings as $k => $booking){
+                        $bookingsByDay[$key][$k]['backgroundColor'] = 'red';
+                        $bookingsByDay[$key][$k]['borderColor'] = 'red';
+                        $bookingsByDay[$key][$k]['textColor'] = 'black';
+                    }
+                }
+            }
+            foreach ($bookingsByDay as $bookings){
+                foreach ($bookings as $booking){
+                    $bookingsData['calendar'][] = $booking;
+                }
+            }
+        }
+        
+        foreach($bookingsData['calendar'] as $booking){
+            $bookingsData['form']['dateA'][] = $booking['start'];
+            $bookingsData['form']['dateD'][] = $booking['end'];
+            $bookingsData['form']['type'][] = $booking['title'];
+        }
+
+        return $bookingsData;
     }
 
     // /**

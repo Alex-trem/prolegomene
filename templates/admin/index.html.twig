@@ -1,0 +1,23 @@
+{% extends '@EasyAdmin/welcome.html.twig' %}
+
+
+{% block page_content %} 
+    
+    <div id="theCalendar">
+	</div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+			var calendarEl = document.getElementById('theCalendar');
+			let calendar = new FullCalendar.Calendar(calendarEl, {
+				initialView: 'dayGridMonth',
+				default: false,
+				headerToolbar: {
+					end: 'prev,next',
+				},
+				events: {{ bookingsData|raw }},
+			});
+			calendar.render();
+		});
+    </script>
+	        
+{% endblock %}
