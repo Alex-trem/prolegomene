@@ -98,7 +98,6 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
         if (is_null($target_path) || $referer === '/register' || $referer === '/login'){
             return new RedirectResponse($this->urlGenerator->generate('home'));
         }
-
         return new RedirectResponse($target_path);
     }
 
