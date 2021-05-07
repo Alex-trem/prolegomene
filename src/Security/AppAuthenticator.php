@@ -96,8 +96,14 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
             return new RedirectResponse($targetPath);
         }
         
-        $referer = $request->get('_target_path');
-        return new RedirectResponse($referer);
+        $target_path = $request->get('_target_path');
+        $referer = substr($target_path, strrpos($target_path, '/', -1));
+
+        if (is_null($target_path) || $referer === '/register'){
+            return new RedirectResponse($this->urlGenerator->generate('home'));
+        }
+
+        return new RedirectResponse($target_path);
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
