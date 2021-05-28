@@ -5,6 +5,8 @@ namespace App\Form;
 use App\Entity\Bedroom;
 use App\Entity\Booking;
 use App\Repository\BedroomRepository;
+use Doctrine\ORM\Mapping\Entity;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -36,7 +38,7 @@ class BookingFormType extends AbstractType
                 'choices' => $bedrooms,
                 'placeholder' => 'Choose a room',
                 'attr' => [
-                    'onchange' => 'verif(this.value)'
+                    'onchange' => 'verif(this.value)',
                 ],
             ])
             ->add('arrivalAt', DateType::class, [
@@ -58,7 +60,7 @@ class BookingFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'bedrooms' => array()
+            'bedrooms' => array(),
         ]);
     }
 }

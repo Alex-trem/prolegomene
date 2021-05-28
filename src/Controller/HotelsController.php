@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Hotel;
 use Twig\Environment;
 use App\Entity\Review;
+use App\Entity\Bedroom;
 use App\Entity\Booking;
 use App\Form\NullFormType;
 use App\Form\ReviewFormType;
@@ -53,6 +54,7 @@ class HotelsController extends AbstractController
         ReviewRepository $reviewRepo,
         BookingValidator $bookingValidator
     ): Response {
+        
         $user = $this->getUser();
 
         //-- FORMULAIRE BOOKING --//
@@ -60,10 +62,14 @@ class HotelsController extends AbstractController
         $bedrooms = $bedroomRepo->findAll();
         $booking = new Booking();
         $bookingForm = $this->createForm(BookingFormType::class, $booking, [
-            'bedrooms' => $bedrooms
+            'bedrooms' => $bedrooms,
         ]);
         $bookingForm->handleRequest($request);
         if ($bookingForm->isSubmitted() && $bookingForm->isValid()) {
+            if(is_null($user)){
+                $this->addFlash('danger', 'You must be connected to reserve');
+                return $this->redirectToRoute('app_login');
+            }
             $booking->setHotel($hotel);
             $booking->setUser($user);
 
