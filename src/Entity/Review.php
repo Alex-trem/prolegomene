@@ -4,12 +4,28 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReviewRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\Api\ReviewCreateController;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
  */
+#[ApiResource(
+    normalizationContext: ['groups' => ['read:review']],
+    itemOperations: [
+        'get' => [
+            'normalization_context' => ['groups' => ['read:review']]
+        ],
+        'put' => [
+            'denormalization_context' => ['groups' => ['write:review']]
+        ]
+    ]
+)]
 class Review
 {
     /**
@@ -17,17 +33,20 @@ class Review
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
+    #[Groups(['read:review'])]
     private $id;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\Range(min=0, max=10)
      */
+    #[Groups(['write:review', 'read:review'])]
     private $rating;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
+    #[Groups(['read:review'])]
     private $comment;
 
     /**
@@ -39,6 +58,7 @@ class Review
      * @ORM\ManyToOne(targetEntity=Hotel::class, inversedBy="reviews")
      * @ORM\JoinColumn(nullable=false)
      */
+    #[Groups(['read:review'])]
     private $hotel;
 
     /**
@@ -51,6 +71,7 @@ class Review
      * @ORM\OneToOne(targetEntity=Booking::class, cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
+    #[Groups(['read:review'])]
     private $booking;
 
     public function __construct()
