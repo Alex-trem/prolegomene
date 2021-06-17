@@ -44,7 +44,7 @@ class BookingFormType extends AbstractType
             ->add('arrivalAt', DateType::class, [
                 'format' => 'yyyy-MM-dd',
                 'attr' => [
-                    'onchange' => 'verif()'
+                    'onchange' => 'verif(this.value)'
                 ],
             ])
             ->add('departureAt', DateType::class, [
