@@ -22,22 +22,24 @@
 					<p class="d-inline-block text-mutted">{{ hotel.address }}</p>
 				</div>
 			</div>
-			<div class="row my-2 text-center">
-				<div class="col-md-4">
-					<h4>Description</h4>
-					{{ hotel.description }}
+			<div class="row text-center nav nav-tabs">
+				<div class="col-md-4 nav-item">
+					<h4 class="nav-link active"><a href="#description">Description</a></h4>
 				</div>
-				<div class="col-md-4">
-					<h4>Informations</h4>
-					{{ hotel.informations }}
+				<div class="col-md-4 nav-item">
+					<h4 class="nav-link"><a href="#informations">Informations</a></h4>
 				</div>
-				<div class="col-md-4">
-					<h4>Characteristics</h4>
-					{{ hotel.characteristics }}
+				<div class="col-md-4 nav-item">
+					<h4 class="nav-link"><a href="#characteristics">Characteristics</a></h4>
+				</div>
+				<div class="my-4 mx-auto">
+					<div class="content-tab active-content" id="description">{{ hotel.description }}</div>
+					<div class="content-tab" id="informations">{{ hotel.informations }}</div>
+					<div class="content-tab" id="characteristics">{{ hotel.characteristics }}</div>
 				</div>
 			</div>
 			{% if reviews %}
-				<div class="text-mutted text-center">
+				<div class="text-mutted text-center mt-5">
 					<h4>Reviews :</h4>
 					{% for review in reviews %}
 						<div class="col-4 border rounded">
@@ -170,7 +172,6 @@
 			}
 		}
 	};
-
 	
 	</script>
 {% endblock %}
