@@ -5,9 +5,7 @@ namespace App\Controller;
 use App\Entity\Hotel;
 use Twig\Environment;
 use App\Entity\Review;
-use App\Entity\Bedroom;
 use App\Entity\Booking;
-use App\Form\NullFormType;
 use App\Form\ReviewFormType;
 use App\Form\BookingFormType;
 use App\Repository\HotelRepository;
@@ -19,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HotelsController extends AbstractController

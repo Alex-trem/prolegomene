@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Hotel;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,13 +27,13 @@ class HotelRepository extends ServiceEntityRepository
     {
         $query = $this->createQueryBuilder('h')
             ->orderBy('h.id', 'DESC')
-            ->setMaxResults(self::PAGINATOR_PER_PAGE)
             ->setFirstResult($offset)
-            ->getQuery()
+            ->setMaxResults(self::PAGINATOR_PER_PAGE)
             ;
         
         return new Paginator($query);
     }
+    
 
     // /**
     //  * @return Hotel[] Returns an array of Hotel objects

@@ -12,7 +12,7 @@
                     <h5>{{ hotel.city }} - {{ hotel.country }}</h5>
                     <p class="card-text">{{ hotel.description }}</p>
                     <div class="d-flex justify-content-between align-items-center">
-                        <a class="btn btn-sm btn-outline-primary text-decoration-none" href="{{path('booking', {slug: hotel.slug, month:date('m') | date('m'), year:date('Y') | date('Y')} ) }}">Reserver</a>
+                        <a class="btn btn-sm btn-outline-primary text-decoration-none" href="{{path('booking', {slug: hotel.slug} ) }}">Reserver</a>
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="d-flex justify-content-between">
-    {% if previous %}
+    {% if previous >= 0 %}
         <a href="{{ path('home', { offset: previous }) }}" class="btn btn-outline-primary"><img src="{{ asset('style/previous.png') }}" height="10" class="mr-3" alt="">Previous</a>
     {% endif %}
     {% if next < hotels|length %}
