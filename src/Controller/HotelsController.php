@@ -72,7 +72,7 @@ class HotelsController extends AbstractController
 
             if ($booking->arrivalAt->format('Y-m-d') < (new \DateTime())->format('Y-m-d')) {
                 $this->addFlash('danger', 'The date can\'t be in the past');
-                return $this->redirectToRoute('booking', ['slug' => $hotel]);
+                return $this->redirectToRoute('booking', ['slug' => $hotel->slug]);
             }
 
             $keys[] = $booking->arrivalAt->format('Y-m-d');
@@ -83,7 +83,7 @@ class HotelsController extends AbstractController
                 foreach ($existingBookings as $existingBooking) {
                     if (array_values($keys) === array_values($existingBooking)) {
                         $this->addFlash('danger', 'This room is no longer available for these dates');
-                        return $this->redirectToRoute('booking', ['slug' => $hotel]);
+                        return $this->redirectToRoute('booking', ['slug' => $hotel->slug]);
                     }
                 }
             }
@@ -93,7 +93,7 @@ class HotelsController extends AbstractController
 
             $this->addFlash('success', 'Your booking has been registered');
 
-            return $this->redirectToRoute('booking', ['slug' => $hotel]);
+            return $this->redirectToRoute('booking', ['slug' => $hotel->slug]);
         }
 
         //-- FORMULAIRE REVIEWS --//
@@ -118,7 +118,7 @@ class HotelsController extends AbstractController
 
             $this->addFlash('success', 'Your comment has been published');
 
-            return $this->redirectToRoute('booking', ['slug' => $hotel]);
+            return $this->redirectToRoute('booking', ['slug' => $hotel->slug]);
         }
 
 

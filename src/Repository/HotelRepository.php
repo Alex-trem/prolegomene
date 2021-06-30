@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Hotel;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

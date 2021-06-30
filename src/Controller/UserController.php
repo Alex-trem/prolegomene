@@ -25,7 +25,7 @@ class UserController extends AbstractController
         $user = $this->getUser();
 
         if (is_null($user)){
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_login');
         }
 
         $bookings = $bookingRepo->findBy(['user' => $user]);

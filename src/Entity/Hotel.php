@@ -3,10 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\HotelRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\HotelRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -66,7 +65,7 @@ class Hotel
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $slug;
+    public $slug;
 
     /**
      * @ORM\OneToMany(targetEntity=Review::class, mappedBy="hotel", orphanRemoval=true)
