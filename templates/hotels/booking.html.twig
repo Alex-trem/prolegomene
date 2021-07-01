@@ -41,16 +41,18 @@
 			{% if reviews %}
 				<div class="text-mutted text-center mt-5">
 					<h4>Reviews :</h4>
-					{% for review in reviews %}
-						<div class="col-4 border rounded">
-							<strong>Rating :
-								{{ review.rating }}/10</strong><br>
-							<em>{{ review.user }}</em>
-							<p>&laquo;
-								{{ review.comment }}
-								&raquo;</p>
-						</div>
-					{% endfor %}
+					<div class="d-flex justify-content-around row col-12">
+						{% for review in reviews %}
+							<div class="col-4 border rounded">
+								<strong>Rating :
+									{{ review.rating }}/10</strong><br>
+								<em>{{ review.user }}</em>
+								<p>&laquo;
+									{{ review.comment }}
+									&raquo;</p>
+							</div>
+						{% endfor %}
+					</div>
 				</div>
 			{% endif %}
 			<div class="mt-5">

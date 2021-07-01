@@ -86,6 +86,7 @@ class BookingRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('b')
             ->andWhere('b.hotel = :hotel')
             ->andWhere('b.user = :user')
+            ->andWhere('b.has_review = false')
             ->setParameter('hotel', $hotel)
             ->setParameter('user', $user)
             ->getQuery()

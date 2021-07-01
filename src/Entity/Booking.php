@@ -5,7 +5,6 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\BookingRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -13,6 +12,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Entity(repositoryClass=BookingRepository::class)
  * @UniqueEntity(fields={"arrivalAt", "hotel", "bedroomType"})
  */
+#[ApiResource(
+    itemOperations:["get"],
+    collectionOperations: []
+)]
 class Booking
 {
     /**
@@ -55,10 +58,16 @@ class Booking
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $has_review;
+
     public function __construct()
     {
         $this->arrivalAt = new \DateTime();
         $this->departureAt = new \DateTime();
+        $this->has_review = false;
     }
 
     public function __toString()
@@ -139,6 +148,18 @@ class Booking
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getHasReview(): ?bool
+    {
+        return $this->has_review;
+    }
+
+    public function setHasReview(bool $has_review): self
+    {
+        $this->has_review = $has_review;
 
         return $this;
     }

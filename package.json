@@ -1,27 +1,27 @@
 {
-  "name": "prolegomene",
-  "version": "1.0.0",
-  "description": "",
-  "main": "js.js",
-  "dependencies": {
-    "cypress": "^7.6.0",
-    "dateformat": "^4.5.1",
-    "moment": "^2.29.1"
-  },
-  "devDependencies": {
-    "enquirer": "^2.3.6"
-  },
-  "scripts": {
-    "test": "cypress open"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Alex-trem/prolegomene.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Alex-trem/prolegomene/issues"
-  },
-  "homepage": "https://github.com/Alex-trem/prolegomene#readme"
-}
+    "name": "prolegomene",
+    "version": "1.0.0",
+    "description": "",
+    "main": "js.js",
+    "dependencies": {
+      "cypress": "^7.6.0",
+      "dateformat": "^4.5.1",
+      "moment": "^2.29.1"
+    },
+    "devDependencies": {
+      "enquirer": "^2.3.6"
+    },
+    "scripts": {
+      "test": "cypress open"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/Alex-trem/prolegomene.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/Alex-trem/prolegomene/issues"
+    },
+    "homepage": "https://github.com/Alex-trem/prolegomene#readme"
+  }

@@ -6,8 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReviewRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Controller\Api\ReviewCreateController;
-use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -16,16 +14,18 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
  */
 #[ApiResource(
+    attributes: [
+        "order" => ["createdAt" => "DESC"]
+    ],
+    paginationItemsPerPage: 6,
     normalizationContext: ['groups' => ['read:review']],
     itemOperations: [
         'get' => [
             'normalization_context' => ['groups' => ['read:review']]
-        ],
-        'put' => [
-            'denormalization_context' => ['groups' => ['write:review']]
         ]
     ]
 )]
+#[ApiFilter(SearchFilter::class, properties:["hotel" => "exact"])]
 class Review
 {
     /**
@@ -52,6 +52,7 @@ class Review
     /**
      * @ORM\Column(type="datetime")
      */
+    #[Groups(['read:review'])]
     private $createdAt;
 
     /**
@@ -65,6 +66,7 @@ class Review
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="reviews")
      * @ORM\JoinColumn(nullable=false)
      */
+    #[Groups(['read:review'])]
     private $user;
 
     /**

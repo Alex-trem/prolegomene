@@ -1,5 +1,19 @@
 {% extends "base.html.twig" %}
 
+{% block dropdownMenu %}
+
+    <div class="dropdown">
+        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Destinations    
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for p in pays %}
+                <a class="dropdown-item" href="#">{{p.name}}</a>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
 {% block body %}
 
     <div class="row justify-content-center">

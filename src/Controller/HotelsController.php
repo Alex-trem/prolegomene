@@ -34,11 +34,22 @@ class HotelsController extends AbstractController
         $offset = max(0, $request->query->getInt('offset', 0));
         $paginator = $hotelRepository->getHotelPaginator($offset);
 
+        $curl = curl_init("https://restcountries.eu/rest/v2/region/europe");
+        curl_setopt_array($curl, [
+            CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR . 'cert.cer',
+            CURLOPT_RETURNTRANSFER => true
+        ]);
+        $pays = curl_exec($curl);
+        $pays = json_decode($pays);
+
         return $this->render('hotels/index.html.twig', [
             'hotels' => $paginator,
             'previous' => $offset - HotelRepository::PAGINATOR_PER_PAGE,
             'next'  => min(count($paginator), $offset + HotelRepository::PAGINATOR_PER_PAGE),
+            'pays' => $pays
         ]);
+
+        curl_close($curl);
     }
 
     #[Route('/booking/{slug}', name: 'booking')]
@@ -112,6 +123,10 @@ class HotelsController extends AbstractController
             if ($user){
                 $review->setUser($user);
             }
+
+            /** @var Booking $booking */
+            $booking = $bookingRepo->findOneBy(["id" => $review->getBooking()]);
+            $booking->setHasReview(true);
 
             $entityManager->persist($review);
             $entityManager->flush();
