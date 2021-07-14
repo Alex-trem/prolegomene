@@ -2,10 +2,9 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Bedroom;
-use DateInterval;
 use App\Entity\User;
 use App\Entity\Hotel;
+use App\Entity\Bedroom;
 use App\Entity\Booking;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -46,7 +45,7 @@ class AppFixtures extends Fixture
             $booking = (new Booking())
                 ->setCustomers($faker->numberBetween(1, 6))
                 ->setArrivalAt(new \DateTime())
-                ->setDepartureAt((new \DateTime())->add(new \DateInterval("P1D")))
+                ->setDepartureAt((new \DateTimeImmutable())->modify("+1 day"))
                 ->setHotel($hotel)
                 ->setBedroomType($faker->numberBetween(1, 6))
                 ->setUser($user)

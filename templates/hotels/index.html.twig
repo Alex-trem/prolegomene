@@ -2,16 +2,12 @@
 
 {% block dropdownMenu %}
 
-    <div class="dropdown">
-        <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Destinations    
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            {% for p in pays %}
-                <a class="dropdown-item" href="#">{{p.name}}</a>
-            {% endfor %}
-        </div>
-    </div>
+{{ form_start(search_form) }}
+<div class="d-flex pt-2">
+{{ form_row(search_form.country) }}
+{{ form_row(search_form.submit) }}
+</div>
+{{ form_end(search_form) }}
 
 {% endblock %}
 {% block body %}
@@ -34,12 +30,19 @@
     {% endfor %}
     </div>
 
-    <div class="d-flex justify-content-between">
-    {% if previous >= 0 %}
-        <a href="{{ path('home', { offset: previous }) }}" class="btn btn-outline-primary"><img src="{{ asset('style/previous.png') }}" height="10" class="mr-3" alt="">Previous</a>
+    <div class="pagination">
+    {% if app.request.get("page", 1) > 1 %}
+        <a href="{{ path("home", { page: app.request.get("page", 1) - 1}) }}" data-role="previous" class="page-item"><p class="page-link">Precedent</p></a>
     {% endif %}
-    {% if next < hotels|length %}
-        <a href="{{ path('home', { offset: next }) }}" class="btn btn-outline-primary">Next<img src="{{ asset('style/next.png') }}" height="10" class="ml-3" alt=""></a>
+        {% set pagination = range(
+            max(1, app.request.get("page", 1) -3),
+            min(total, app.request.get("page", 1) +3)
+        ) %}
+        {% for pagi in pagination %}
+            <a href="{{ path("home", { page: pagi}) }}" class="{{ pagi == app.request.get("page", 1) ? "active" : "" }} page-item"><p class="page-link">{{ pagi }}</p></a>
+        {% endfor %}
+    {% if app.request.get("page", 1) < total %}
+        <a href="{{ path("home", { page: app.request.get("page", 1) + 1}) }}" data-role="next" class="page-item"><p class="page-link">Suivant</p></a>
     {% endif %}
     </div>
     

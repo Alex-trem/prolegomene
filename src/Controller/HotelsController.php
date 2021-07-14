@@ -5,7 +5,9 @@ namespace App\Controller;
 use App\Entity\Hotel;
 use Twig\Environment;
 use App\Entity\Review;
+use App\Entity\Search;
 use App\Entity\Booking;
+use App\Form\SearchForm;
 use App\Form\ReviewFormType;
 use App\Form\BookingFormType;
 use App\Repository\HotelRepository;
@@ -31,22 +33,42 @@ class HotelsController extends AbstractController
     #[Route('/', name: 'home')]
     public function index(Request $request, HotelRepository $hotelRepository): Response
     {
-        $offset = max(0, $request->query->getInt('offset', 0));
-        $paginator = $hotelRepository->getHotelPaginator($offset);
+        $page = $request->query->getInt("page", 1);
 
-        $curl = curl_init("https://restcountries.eu/rest/v2/region/europe");
+        $curl = curl_init("https://restcountries.eu/rest/v2/all");
         curl_setopt_array($curl, [
             CURLOPT_CAINFO => __DIR__ . DIRECTORY_SEPARATOR . 'cert.cer',
             CURLOPT_RETURNTRANSFER => true
         ]);
-        $pays = curl_exec($curl);
-        $pays = json_decode($pays);
+        $countries = curl_exec($curl);
+        $countries = json_decode($countries);
+        for ($i = 0; $i < sizeof($countries); $i++) {
+            $choices[$countries[$i]->name] = $countries[$i]->name;
+        }
+
+        $searchForm = $this->createForm(SearchForm::class, null, [
+            'countries' => $choices
+        ]);
+        $searchForm->handleRequest($request);
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            $data = $searchForm->getData();
+            $search = (new Search())->setCountry($data['country']);
+
+            if (sizeof($hotelRepository->findBy(['country' => $search->getCountry()])) > 0){
+                return $this->render('hotels/index.html.twig', [
+                    'hotels' => $hotelRepository->findBy(['country' => $search->getCountry()], null, 9, ($page-1) * 9),
+                    'total' => ceil($hotelRepository->count([])),
+                    'pays' => $countries,
+                    'search_form' => $searchForm->createView(),
+                ]);
+            }
+        }
 
         return $this->render('hotels/index.html.twig', [
-            'hotels' => $paginator,
-            'previous' => $offset - HotelRepository::PAGINATOR_PER_PAGE,
-            'next'  => min(count($paginator), $offset + HotelRepository::PAGINATOR_PER_PAGE),
-            'pays' => $pays
+            'hotels' => $hotelRepository->findBy([], null, 9, ($page-1) * 9),
+            'total' => ceil($hotelRepository->count([])/9),
+            'pays' => $countries,
+            'search_form' => $searchForm->createView(),
         ]);
 
         curl_close($curl);

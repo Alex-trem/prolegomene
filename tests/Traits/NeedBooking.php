@@ -20,7 +20,7 @@ trait NeedBooking
         $booking = (new Booking())
             ->setCustomers(1)
             ->setDepartureAt(new \DateTime())
-            ->setDepartureAt((new \DateTime())->add(new \DateInterval('P1D')))
+            ->setDepartureAt((new \DateTimeImmutable())->modify("+1 day"))
             ->setHotel($hotel)
             ->setBedroomType(1)
             ->setUser($client->getContainer()->get('doctrine.orm.entity_manager')->getRepository(User::class)->findOneBy(["id" => 1]))

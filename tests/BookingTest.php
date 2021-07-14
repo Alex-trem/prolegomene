@@ -41,6 +41,10 @@ class BookingTest extends WebTestCase
          $client = static::createClient();
          $client->request('GET', '/');
 
+        $hotelRepo = $client->getContainer()->get("doctrine.orm.entity_manager")->getRepository(Hotel::class);
+        $total = $hotelRepo->count([]);
+        $this->assertEquals(20, $total);
+
          $this->assertResponseIsSuccessful();
      }
 

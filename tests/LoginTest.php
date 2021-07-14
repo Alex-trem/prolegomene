@@ -8,6 +8,25 @@ class LoginTest extends WebTestCase
 {
     use NeedUser;
 
+    public function testAuthticationSuccess(): void
+    {
+        $client = static::createClient();
+
+        /** @var UrlGeneratorInterface $urlGenerator */
+        $urlGenerator = $client->getContainer()->get("router");
+
+        $crawler = $client->request("GET", $urlGenerator->generate("app_login"));
+
+        $form = $crawler->selectButton("Sign in")->form([
+            "email" => "user0@gmail.com",
+            "password" => "password"
+        ]);
+
+        $client->submit($form);
+ 
+        $this->assertResponseStatusCodeSame(302);
+    }
+
     public function testUserPageAccessRedirect(): void
     {
         $client = static::createClient();
@@ -27,7 +46,6 @@ class LoginTest extends WebTestCase
         $client->request('GET', '/login');
         $this->assertResponseRedirects('/');
     }
-    
 
     public function testAuthenticatError(): void
     {

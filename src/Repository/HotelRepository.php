@@ -33,6 +33,24 @@ class HotelRepository extends ServiceEntityRepository
         return new Paginator($query);
     }
     
+    public function getHotelPaginatorByCountry(int $offset, string $country): Paginator
+    {
+        $query = $this->createQueryBuilder('h')
+            ->andWhere("h.country = '$country'")
+            ->orderBy('h.id', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults(self::PAGINATOR_PER_PAGE)
+            ;
+        
+        return new Paginator($query);
+    }
+
+    // public function findSearch(Search $datas): Paginator
+    // {
+    //    dd($datas);
+
+    // }
+    
 
     // /**
     //  * @return Hotel[] Returns an array of Hotel objects
