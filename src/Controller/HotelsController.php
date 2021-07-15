@@ -57,7 +57,7 @@ class HotelsController extends AbstractController
             if (sizeof($hotelRepository->findBy(['country' => $search->getCountry()])) > 0){
                 return $this->render('hotels/index.html.twig', [
                     'hotels' => $hotelRepository->findBy(['country' => $search->getCountry()], null, 9, ($page-1) * 9),
-                    'total' => ceil($hotelRepository->count([])),
+                    'total' => ceil($hotelRepository->count(['country' => $search->getCountry()])),
                     'pays' => $countries,
                     'search_form' => $searchForm->createView(),
                 ]);

@@ -4,15 +4,11 @@
     "description": "",
     "main": "js.js",
     "dependencies": {
-      "cypress": "^7.6.0",
       "dateformat": "^4.5.1",
       "moment": "^2.29.1"
     },
     "devDependencies": {
       "enquirer": "^2.3.6"
-    },
-    "scripts": {
-      "test": "cypress open"
     },
     "repository": {
       "type": "git",
