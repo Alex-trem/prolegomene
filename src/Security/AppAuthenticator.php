@@ -94,7 +94,10 @@ class AppAuthenticator extends AbstractFormLoginAuthenticator implements Passwor
     {
         $target_path = $request->get('_target_path');
         if (!empty($target_path)){
-            $referer = substr($target_path, strrpos($target_path, '/', -1));
+            $referer = substr($target_path, strrpos($target_path, '/'));
+            if (str_contains($target_path, "booking")){
+                $referer = "/booking" . $referer;
+            }
             if ($referer !== '/register' || $referer !== '/login') {
                 return new RedirectResponse($referer);
             }
